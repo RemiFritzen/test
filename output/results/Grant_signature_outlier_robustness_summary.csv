@@ -1,0 +1,3 @@
+tissue,signature_label,p_full,loo_p_min,loo_p_max,loo_worst_patient,loo_worst_group,loo_all_significant,n_tukey_excluded,tukey_excluded_patients,p_tukey,tukey_significant
+CSF,signed,0.002932333367115976,0.0007796322670464548,0.00848890240194588,PST45044_CSF,HC,True,1,['PST45044_CSF'],0.00848890240194588,True
+PB,signed,0.04698788625562081,0.01895014215380348,0.09670064489286458,PTC32190_PB,HC,False,0,[],0.04698788625562081,True
