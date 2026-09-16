@@ -1,7 +1,0 @@
-gene_x,gene_y,n_patients,spearman_r,spearman_p,sex_stratum
-VGLL3,CXCL13,19,,,all
-VGLL3,CXCL13,7,,,M
-VGLL3,CXCL13,12,,,F
-VGLL3,TNFSF13B,19,,,all
-VGLL3,TNFSF13B,7,,,M
-VGLL3,TNFSF13B,12,,,F
