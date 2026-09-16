@@ -6,18 +6,30 @@ Patient-level Figure 4 for CXCR3 / zinc project.
 
 Main figure:
 - A/B: zinc signature vs EDSS in CSF / PB
-- C/D: HC vs MS boxplots with on-panel Mann-Whitney p-values
+
+The HC-vs-MS comparison that used to occupy panels C/D has been REMOVED
+from this figure. It is the same patient-level Mann-Whitney test that
+Figure 2C/D already reports, and Figure 2 is authoritative for it:
+Fig2.py reads condition directly from the h5ad `obs`, whereas this script
+inner-joins onto the hard-coded `load_clinical_metadata()` table, which
+silently drops any patient without a matching row. That produced a
+smaller n and a different p-value here than in Figure 2 for the same
+comparison. Do not reinstate C/D without first reconciling
+`load_clinical_metadata()` against the h5ad metadata (see the notes on
+that function).
+
+Set EMIT_HC_VS_MS_PANELS = True below to regenerate the old C/D panels,
+their CSVs and the supplementary HC-vs-MS boxplots.
 
 Supplementary figures:
-- HC / MS boxplots for zinc signature in CSF / PB
 - One PDF per gene, with 2 panels each: CSF vs EDSS and PB vs EDSS
 
 Runs for TWO populations (CXCR3+ B cells, primary; all B cells regardless
 of CXCR3 status, supplementary) -- see run_fig4_for_population(). Output
 is organized as:
 
-    <fig_dir>/<file_tag>/main/   -- main 4-panel figure + its panel CSVs
-    <fig_dir>/<file_tag>/supp/   -- boxplots, per-gene EDSS PDFs, LOO
+    <fig_dir>/<file_tag>/main/   -- main 2-panel figure + its panel CSVs
+    <fig_dir>/<file_tag>/supp/   -- per-gene EDSS PDFs, LOO
                                      robustness checks, unsigned-signature
                                      comparison, correlation tables
 
@@ -54,6 +66,15 @@ PAL3 = {"HC": "#757575", "MS": "#1b9e77"}
 PAL2 = {"HC": "#757575", "Disease": "#1b9e77"}
 
 
+# ---------------------------------------------------------------------------
+# HC-vs-MS panels (old Fig 4C/D + the supplementary boxplots of the same
+# comparison) are OFF. Figure 2C/D is the reported version of this test --
+# see the module docstring. Flip to True only to reproduce the old output
+# for comparison; it is not the figure that should be published.
+# ---------------------------------------------------------------------------
+EMIT_HC_VS_MS_PANELS = False
+
+
 def load_markers(cfg: dict) -> list[str]:
     markers = cfg.get("markers", {})
     mt = markers.get("metallothioneins", [])
@@ -76,6 +97,33 @@ def load_marker_categories(cfg: dict) -> tuple[list[str], list[str]]:
 
 
 def load_clinical_metadata() -> pd.DataFrame:
+    """
+    Hard-coded clinical table. Everything in this script is inner-joined onto
+    it by `patient_num`, so a patient missing from here (or spelled
+    differently here) is silently dropped from every panel -- which is why
+    check_patient_num_mapping() exists.
+
+    The GSE138266 block was corrected against the source patient list
+    (GSE138266_patient_list.xlsx, Schafflick et al. Table 1, rows with
+    `cohort == "scRNA-seq"`). Every genotype-based sex call in
+    sex_annotation_check.csv agrees with that file. What changed:
+
+      * MS58637 (MS, m, 22, EDSS 0.0) was ABSENT from this table entirely
+        and was therefore dropped from every panel. Added.
+      * "MS45044" -> PST45044. The source lists 45044 as `co` (control),
+        female, 25 -- not RRMS with EDSS 1.0. Diagnosis corrected to HC and
+        the spurious EDSS removed; this also makes the ID match the h5ad.
+      * MS60249 sex M -> F, and EDSS 0.0 -> 1.0.
+      * MS19270 EDSS 0.5 -> 0.0 and MS49131 EDSS 2.5 -> 4.5. The old values
+        were EDSS @FU (at latest follow-up); these are EDSS @DC (at
+        diagnosis/collection), which is contemporaneous with the sample and
+        is what Table S1 reports. Both columns exist in the source file --
+        if the follow-up scale is wanted instead, take `EDSS @FU` for ALL
+        patients rather than mixing the two, and say which in the legend.
+
+    GSE133028 rows are unverified against a primary source; they were not
+    touched here.
+    """
     rows = [
         ["1", 43, "F", "RRMS", 0, np.nan, "Untreated", 16],
         ["2", 33, "M", "HC", np.nan, np.nan, "Untreated", np.nan],
@@ -101,12 +149,13 @@ def load_clinical_metadata() -> pd.DataFrame:
         ["PTC41540", 32, "F", "HC", np.nan, np.nan, "Untreated", np.nan],
         ["PTC85037", 25, "F", "HC", np.nan, np.nan, "Untreated", np.nan],
         ["PTC32190", 33, "M", "HC", np.nan, np.nan, "Untreated", np.nan],
-        ["MS45044", 25, "F", "RRMS", 1.0, np.nan, "Untreated", np.nan],
-        ["MS60249", 28, "M", "RRMS", 0.0, np.nan, "Untreated", np.nan],
+        ["PST45044", 25, "F", "HC", np.nan, np.nan, "Untreated", np.nan],
+        ["MS60249", 28, "F", "RRMS", 1.0, np.nan, "Untreated", np.nan],
+        ["MS58637", 22, "M", "RRMS", 0.0, 6.0, "Untreated", np.nan],
         ["MS74594", 42, "M", "RRMS", 0.0, np.nan, "Untreated", np.nan],
-        ["MS19270", 35, "F", "RRMS", 0.5, np.nan, "Untreated", np.nan],
+        ["MS19270", 35, "F", "RRMS", 0.0, 6.0, "Untreated", np.nan],
         ["MS71658", 47, "F", "RRMS", 6.0, np.nan, "Untreated", np.nan],
-        ["MS49131", 47, "F", "RRMS", 2.5, np.nan, "Untreated", np.nan],
+        ["MS49131", 47, "F", "RRMS", 4.5, np.nan, "Untreated", np.nan],
     ]
     df = pd.DataFrame(
         rows,
@@ -258,12 +307,15 @@ def make_zinc_vs_edss_main_collapsed(
     caller is responsible for passing in `out` already restricted to the
     right population.
 
-    Multiple testing: the 4 panels here (2 Spearman correlations, 2
-    Mann-Whitney tests) are a single pre-specified family of primary-figure
-    tests. Raw p-values for all 4 are computed first, BH-corrected together,
-    and both raw and corrected p are shown on each panel -- rather than
-    reporting 4 uncorrected p-values with no acknowledgement of the
-    multiple-comparison exposure.
+    Multiple testing: the 2 panels here (both Spearman correlations against
+    EDSS) are a single pre-specified family of primary-figure tests. Raw
+    p-values are computed first, BH-corrected together, and both raw and
+    corrected p are shown on each panel.
+
+    NOTE: this used to be a 4-panel figure, with C/D carrying the HC-vs-MS
+    Mann-Whitney test. Those panels duplicated Figure 2C/D and have been
+    removed; the BH family here is now the 2 EDSS panels only. See the
+    module docstring and EMIT_HC_VS_MS_PANELS.
     """
     df = out.copy()
     df["EDSS"] = pd.to_numeric(df["EDSS"], errors="coerce")
@@ -274,42 +326,36 @@ def make_zinc_vs_edss_main_collapsed(
         .infer_objects(copy=False)
     )
 
-    # ---- Pass 1: compute all 4 raw p-values (no plotting yet) ----
+    panel_letters = ["A", "B"]
+
+    # ---- Pass 1: compute both raw p-values (no plotting yet) ----
     panel_stats = {}  # letter -> dict(rho, pval, kind)
-    for tissue, letter in zip(["CSF", "PB"], ["A", "B"]):
+    for tissue, letter in zip(["CSF", "PB"], panel_letters):
         tdf = df[(df["tissue"] == tissue) & df["EDSS"].notna()]
         rho = pval = np.nan
         if len(tdf) >= 3 and tdf["EDSS"].nunique() >= 2:
             rho, pval = spearmanr(tdf["EDSS"], tdf[signature_col])
         panel_stats[letter] = {"rho": rho, "pval": pval, "kind": "spearman"}
 
-    for tissue, letter in zip(["CSF", "PB"], ["C", "D"]):
-        bdf = df[(df["tissue"] == tissue) & (df["diag_collapsed"].isin(["HC", "Disease"]))]
-        hc = bdf[bdf["diag_collapsed"] == "HC"][signature_col].dropna()
-        dis = bdf[bdf["diag_collapsed"] == "Disease"][signature_col].dropna()
-        pval = np.nan
-        if len(hc) >= 1 and len(dis) >= 1:
-            _, pval = mannwhitneyu(hc, dis, alternative="two-sided")
-        panel_stats[letter] = {"rho": np.nan, "pval": pval, "kind": "mannwhitney"}
-
-    raw_pvals = [panel_stats[l]["pval"] for l in ["A", "B", "C", "D"]]
+    raw_pvals = [panel_stats[l]["pval"] for l in panel_letters]
     valid_mask = np.isfinite(raw_pvals)
-    padj = np.full(4, np.nan)
+    padj = np.full(len(panel_letters), np.nan)
     if valid_mask.sum() > 0:
         padj[valid_mask] = multipletests(np.array(raw_pvals)[valid_mask], method="fdr_bh")[1]
-    for i, letter in enumerate(["A", "B", "C", "D"]):
+    for i, letter in enumerate(panel_letters):
         panel_stats[letter]["padj"] = padj[i]
 
-    print(f"  [{signature_label}] Fig4 main-panel p-values (BH-corrected across all 4 panels):")
-    for letter in ["A", "B", "C", "D"]:
+    print(f"  [{signature_label}] Fig4 main-panel p-values "
+          f"(BH-corrected across the {len(panel_letters)} EDSS panels):")
+    for letter in panel_letters:
         s = panel_stats[letter]
         print(f"    Panel {letter}: raw p={_format_p(s['pval'])}, padj={_format_p(s['padj'])}")
 
     # ---- Pass 2: plot, using the precomputed/corrected stats ----
-    fig, axes = plt.subplots(2, 2, figsize=(14, 10), sharey="row")
-    fig.subplots_adjust(wspace=0.35, hspace=0.45)
+    fig, axes = plt.subplots(1, 2, figsize=(14, 5.5), sharey=True)
+    fig.subplots_adjust(wspace=0.25)
 
-    for ax, tissue, letter in zip(axes[0], ["CSF", "PB"], ["A", "B"]):
+    for ax, tissue, letter in zip(axes, ["CSF", "PB"], panel_letters):
         tdf = df[(df["tissue"] == tissue) & df["EDSS"].notna()].copy()
 
         for grp, gdf in tdf.groupby("diagnosis_group"):
@@ -338,62 +384,15 @@ def make_zinc_vs_edss_main_collapsed(
             ax.set_title(f"{letter}. {tissue} {population_label} B cells ({signature_label})", fontsize=12, weight="bold")
         ax.set_xlabel("EDSS", fontsize=11)
 
-    axes[0, 0].set_ylabel(f"Mean zinc signature ({signature_label})", fontsize=11)
+    axes[0].set_ylabel(f"Mean zinc signature ({signature_label})", fontsize=11)
 
-    for ax, tissue, letter in zip(axes[1], ["CSF", "PB"], ["C", "D"]):
-        bdf = df[
-            (df["tissue"] == tissue) &
-            (df["diag_collapsed"].isin(["HC", "Disease"]))
-        ].copy()
-
-        sns.boxplot(
-            data=bdf, x="diag_collapsed", y=signature_col,
-            order=["HC", "Disease"], hue="diag_collapsed",
-            palette=PAL2, ax=ax, fliersize=0, legend=False,
-        )
-        sns.stripplot(
-            data=bdf, x="diag_collapsed", y=signature_col,
-            order=["HC", "Disease"], hue="diag_collapsed",
-            palette=PAL2, dodge=False, ax=ax,
-            linewidth=0.6, edgecolor="black", size=6, alpha=0.9, legend=False,
-        )
-
-        pval, adj = panel_stats[letter]["pval"], panel_stats[letter]["padj"]
-
-        ax.set_title(f"{letter}. {tissue} {population_label} B cells ({signature_label})", fontsize=12, weight="bold")
-        ax.set_xlabel("")
-        ax.set_ylabel(f"Mean zinc signature ({signature_label})", fontsize=11)
-
-        # Dynamically position the p/padj annotation above the actual data
-        # range in THIS panel, instead of a fixed axes-fraction position
-        # (0.5, 0.95) -- the fixed position could land on top of data points
-        # whenever the "Disease" group's spread reaches close to the top of
-        # the axes, which is exactly what happened in the first version of
-        # this figure. Also draws a bracket connecting HC/Disease, matching
-        # the established style in plot_figure1_umap_bar.py's _sig_bracket.
-        y_data_max = bdf[signature_col].max()
-        y_data_min = bdf[signature_col].min()
-        data_range = y_data_max - y_data_min if y_data_max > y_data_min else 1.0
-        bracket_y = y_data_max + data_range * 0.08
-        bracket_h = data_range * 0.03
-
-        ax.plot([0, 0, 1, 1], [bracket_y, bracket_y + bracket_h, bracket_y + bracket_h, bracket_y],
-                lw=1.3, color="black", clip_on=False)
-        ax.text(
-            0.5, bracket_y + bracket_h * 1.3,
-            f"HC vs MS: p={_format_p(pval)}, padj={_format_p(adj)}",
-            ha="center", va="bottom", fontsize=9, clip_on=False,
-        )
-        # Give the bracket/text room to breathe above the tallest data point
-        ax.set_ylim(top=bracket_y + data_range * 0.20)
-
-    handles, labels = axes[0, 0].get_legend_handles_labels()
+    handles, labels = axes[0].get_legend_handles_labels()
     if len(handles) > 1:
-        axes[0, 0].legend(handles, labels, frameon=False, title="Diagnosis")
+        axes[0].legend(handles, labels, frameon=False, title="Diagnosis")
 
     fig.suptitle(
-        f"Figure 4. Zinc signature ({signature_label}) vs EDSS and disease status\nin PB and CSF {population_label} B cells",
-        fontsize=16, weight="bold", y=0.98,
+        f"Figure 4. Zinc signature ({signature_label}) vs EDSS\nin PB and CSF {population_label} B cells",
+        fontsize=16, weight="bold", y=1.14,
     )
 
     png = fig_dir / f"figure4_{file_tag}_zinc_signature_EDSS_main_collapsed_pb_csf{file_suffix}.png"
@@ -880,40 +879,46 @@ def run_fig4_for_population(
     df_4B.to_csv(main_dir / f"Fig4B_PB_zinc_signature_vs_EDSS_patient_level_{file_tag}.csv",
                  index=False)
 
-    df_4C = out[
-        (out["tissue"] == "CSF")
-        & out["diagnosis_group"].isin(["HC", "MS"])
-        & out["zinc_signature"].notna()
-    ][["patient_num", "diagnosis_group", "tissue", "zinc_signature", "n_cells"]]
-    df_4C.to_csv(main_dir / f"Fig4C_CSF_HC_vs_MS_zinc_signature_patient_level_{file_tag}.csv",
-                 index=False)
+    # Panels C/D (HC vs MS) are not part of this figure any more -- Figure 2
+    # reports that comparison. Their CSVs, and the supplementary boxplot data
+    # for the same comparison, are only written if explicitly re-enabled.
+    if EMIT_HC_VS_MS_PANELS:
+        df_4C = out[
+            (out["tissue"] == "CSF")
+            & out["diagnosis_group"].isin(["HC", "MS"])
+            & out["zinc_signature"].notna()
+        ][["patient_num", "diagnosis_group", "tissue", "zinc_signature", "n_cells"]]
+        df_4C.to_csv(main_dir / f"Fig4C_CSF_HC_vs_MS_zinc_signature_patient_level_{file_tag}.csv",
+                     index=False)
 
-    df_4D = out[
-        (out["tissue"] == "PB")
-        & out["diagnosis_group"].isin(["HC", "MS"])
-        & out["zinc_signature"].notna()
-    ][["patient_num", "diagnosis_group", "tissue", "zinc_signature", "n_cells"]]
-    df_4D.to_csv(main_dir / f"Fig4D_PB_HC_vs_MS_zinc_signature_patient_level_{file_tag}.csv",
-                 index=False)
+        df_4D = out[
+            (out["tissue"] == "PB")
+            & out["diagnosis_group"].isin(["HC", "MS"])
+            & out["zinc_signature"].notna()
+        ][["patient_num", "diagnosis_group", "tissue", "zinc_signature", "n_cells"]]
+        df_4D.to_csv(main_dir / f"Fig4D_PB_HC_vs_MS_zinc_signature_patient_level_{file_tag}.csv",
+                     index=False)
 
-    # Supplementary boxplot's underlying data (filename already says "FigSx") -> supp_dir
-    box_df = out[
-        out["diagnosis_group"].isin(["HC", "MS"])
-        & out["zinc_signature"].notna()
-    ][["patient_num", "diagnosis_group", "tissue", "zinc_signature", "n_cells"]]
-    box_df.to_csv(supp_dir / f"FigSx_HC_MS_zinc_signature_patient_level_{file_tag}.csv",
-                  index=False)
+        # Supplementary boxplot's underlying data (filename already says "FigSx") -> supp_dir
+        box_df = out[
+            out["diagnosis_group"].isin(["HC", "MS"])
+            & out["zinc_signature"].notna()
+        ][["patient_num", "diagnosis_group", "tissue", "zinc_signature", "n_cells"]]
+        box_df.to_csv(supp_dir / f"FigSx_HC_MS_zinc_signature_patient_level_{file_tag}.csv",
+                      index=False)
 
     # Main figure: sign-corrected composite (primary) -> main_dir
     make_zinc_vs_edss_main_collapsed(
         out, main_dir, signature_col="zinc_signature", signature_label="signed",
         file_suffix="", population_label=population_label, file_tag=file_tag,
     )
-    # Boxplot is conceptually supplementary regardless of signed/unsigned -> supp_dir
-    make_zinc_boxplots_hc_ms_supp(
-        out, supp_dir, signature_col="zinc_signature", signature_label="signed",
-        file_suffix="", population_label=population_label, file_tag=file_tag,
-    )
+    # Boxplot is conceptually supplementary regardless of signed/unsigned -> supp_dir.
+    # Same HC-vs-MS comparison as old Fig 4C/D and as Figure 2C/D; off by default.
+    if EMIT_HC_VS_MS_PANELS:
+        make_zinc_boxplots_hc_ms_supp(
+            out, supp_dir, signature_col="zinc_signature", signature_label="signed",
+            file_suffix="", population_label=population_label, file_tag=file_tag,
+        )
 
     # Supplementary: unsigned composite, for direct comparison against the
     # signed version above (same rationale as Figs 2-3) -> supp_dir, even
@@ -923,10 +928,11 @@ def run_fig4_for_population(
         out, supp_dir, signature_col="zinc_signature_unsigned", signature_label="unsigned",
         file_suffix="_UNSIGNED", population_label=population_label, file_tag=file_tag,
     )
-    make_zinc_boxplots_hc_ms_supp(
-        out, supp_dir, signature_col="zinc_signature_unsigned", signature_label="unsigned",
-        file_suffix="_UNSIGNED", population_label=population_label, file_tag=file_tag,
-    )
+    if EMIT_HC_VS_MS_PANELS:
+        make_zinc_boxplots_hc_ms_supp(
+            out, supp_dir, signature_col="zinc_signature_unsigned", signature_label="unsigned",
+            file_suffix="_UNSIGNED", population_label=population_label, file_tag=file_tag,
+        )
 
     meta = out[["patient_num", "diagnosis_group", "EDSS", "tissue"]].drop_duplicates()
 
