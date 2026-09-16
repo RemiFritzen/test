@@ -23,7 +23,7 @@
       "n_genes_total": 38606,
       "median_genes": 1424.0,
       "median_counts": 3332.0,
-      "median_pct_mt": 4.4031019211,
+      "median_pct_mt": 0.0,
       "flag_cells": "PASS",
       "flag_genes": "PASS",
       "flag_counts": "PASS",
@@ -38,10 +38,10 @@
       "flag_silhouette": "FAIL",
       "flag_ari": "WARN",
       "stability_overall": "FAIL",
-      "completeness_pct": 28.6,
-      "meta_missing": "patient;donor;celltype;dataset;sample",
+      "completeness_pct": 14.3,
+      "meta_missing": "patient;donor;condition;celltype;dataset;sample",
       "tissue_values": "CSF",
-      "anomalies": "no_celltype_annotation",
+      "anomalies": "no_celltype_annotation;no_condition_column",
       "meta_flag": "WARN"
     },
     {
@@ -272,9 +272,9 @@
       "stability_overall": "WARN",
       "completeness_pct": 28.6,
       "meta_missing": "patient;donor;celltype;dataset;sample",
-      "tissue_values": "PB",
-      "anomalies": "tissue_obs=PB_vs_filename=CSF;no_celltype_annotation",
-      "meta_flag": "FAIL"
+      "tissue_values": "CSF",
+      "anomalies": "no_celltype_annotation",
+      "meta_flag": "WARN"
     },
     {
       "sample_id": "CSF_28",
@@ -417,9 +417,9 @@
       "stability_overall": "WARN",
       "completeness_pct": 28.6,
       "meta_missing": "patient;donor;celltype;dataset;sample",
-      "tissue_values": "PBMC",
-      "anomalies": "nonstandard_tissue_label(PBMC);tissue_obs=PBMC_vs_filename=CSF;no_celltype_annotation",
-      "meta_flag": "FAIL"
+      "tissue_values": "CSF",
+      "anomalies": "no_celltype_annotation",
+      "meta_flag": "WARN"
     },
     {
       "sample_id": "CSF_6",
@@ -446,9 +446,9 @@
       "stability_overall": "PASS",
       "completeness_pct": 28.6,
       "meta_missing": "patient;donor;celltype;dataset;sample",
-      "tissue_values": "PB",
-      "anomalies": "tissue_obs=PB_vs_filename=CSF;no_celltype_annotation",
-      "meta_flag": "FAIL"
+      "tissue_values": "CSF",
+      "anomalies": "no_celltype_annotation",
+      "meta_flag": "WARN"
     },
     {
       "sample_id": "CSF_7",
@@ -620,9 +620,9 @@
       "stability_overall": "PASS",
       "completeness_pct": 28.6,
       "meta_missing": "patient;donor;celltype;dataset;sample",
-      "tissue_values": "CSF",
-      "anomalies": "tissue_obs=CSF_vs_filename=PB;no_celltype_annotation",
-      "meta_flag": "FAIL"
+      "tissue_values": "PB",
+      "anomalies": "no_celltype_annotation",
+      "meta_flag": "WARN"
     },
     {
       "sample_id": "PB_22",
@@ -823,8 +823,8 @@
       "stability_overall": "PASS",
       "completeness_pct": 28.6,
       "meta_missing": "patient;donor;celltype;dataset;sample",
-      "tissue_values": "PBMC",
-      "anomalies": "nonstandard_tissue_label(PBMC);no_celltype_annotation",
+      "tissue_values": "PB",
+      "anomalies": "no_celltype_annotation",
       "meta_flag": "WARN"
     },
     {
@@ -881,8 +881,8 @@
       "stability_overall": "WARN",
       "completeness_pct": 28.6,
       "meta_missing": "patient;donor;celltype;dataset;sample",
-      "tissue_values": "PBMC",
-      "anomalies": "nonstandard_tissue_label(PBMC);no_celltype_annotation",
+      "tissue_values": "PB",
+      "anomalies": "no_celltype_annotation",
       "meta_flag": "WARN"
     },
     {
@@ -910,9 +910,9 @@
       "stability_overall": "PASS",
       "completeness_pct": 28.6,
       "meta_missing": "patient;donor;celltype;dataset;sample",
-      "tissue_values": "CSF",
-      "anomalies": "tissue_obs=CSF_vs_filename=PB;no_celltype_annotation",
-      "meta_flag": "FAIL"
+      "tissue_values": "PB",
+      "anomalies": "no_celltype_annotation",
+      "meta_flag": "WARN"
     },
     {
       "sample_id": "PB_7",
@@ -939,9 +939,9 @@
       "stability_overall": "PASS",
       "completeness_pct": 28.6,
       "meta_missing": "patient;donor;celltype;dataset;sample",
-      "tissue_values": "CSF",
-      "anomalies": "tissue_obs=CSF_vs_filename=PB;no_celltype_annotation",
-      "meta_flag": "FAIL"
+      "tissue_values": "PB",
+      "anomalies": "no_celltype_annotation",
+      "meta_flag": "WARN"
     },
     {
       "sample_id": "PB_8",
@@ -1640,5 +1640,5 @@
       "meta_flag": "WARN"
     }
   ],
-  "generated": "2026-09-16T10:53:11.447899"
+  "generated": "2026-09-16T20:30:33.324069"
 }

@@ -1,5 +1,5 @@
 sample_id,dataset,meta_fields_present,meta_missing,completeness_pct,null_pct_per_field,tissue_values,anomalies,meta_flag
-CSF_10,GSE133028,tissue;condition,patient;donor;celltype;dataset;sample,28.6,"{""tissue"": 0.0, ""condition"": 0.0}",CSF,no_celltype_annotation,WARN
+CSF_10,GSE133028,tissue,patient;donor;condition;celltype;dataset;sample,14.3,"{""tissue"": 0.0}",CSF,no_celltype_annotation;no_condition_column,WARN
 CSF_16,GSE133028,tissue;condition,patient;donor;celltype;dataset;sample,28.6,"{""tissue"": 0.0, ""condition"": 0.0}",CSF,no_celltype_annotation,WARN
 CSF_18,GSE133028,tissue;condition,patient;donor;celltype;dataset;sample,28.6,"{""tissue"": 0.0, ""condition"": 0.0}",CSF,no_celltype_annotation,WARN
 CSF_2,GSE133028,tissue;condition,patient;donor;celltype;dataset;sample,28.6,"{""tissue"": 0.0, ""condition"": 0.0}",CSF,no_celltype_annotation,WARN
@@ -7,30 +7,30 @@ CSF_21,GSE133028,tissue;condition,patient;donor;celltype;dataset;sample,28.6,"{"
 CSF_22,GSE133028,tissue;condition,patient;donor;celltype;dataset;sample,28.6,"{""tissue"": 0.0, ""condition"": 0.0}",CSF,no_celltype_annotation,WARN
 CSF_24,GSE133028,tissue;condition,patient;donor;celltype;dataset;sample,28.6,"{""tissue"": 0.0, ""condition"": 0.0}",CSF,no_celltype_annotation,WARN
 CSF_25,GSE133028,tissue;condition,patient;donor;celltype;dataset;sample,28.6,"{""tissue"": 0.0, ""condition"": 0.0}",CSF,no_celltype_annotation,WARN
-CSF_27,GSE133028,tissue;condition,patient;donor;celltype;dataset;sample,28.6,"{""tissue"": 0.0, ""condition"": 0.0}",PB,tissue_obs=PB_vs_filename=CSF;no_celltype_annotation,FAIL
+CSF_27,GSE133028,tissue;condition,patient;donor;celltype;dataset;sample,28.6,"{""tissue"": 0.0, ""condition"": 0.0}",CSF,no_celltype_annotation,WARN
 CSF_28,GSE133028,tissue;condition,patient;donor;celltype;dataset;sample,28.6,"{""tissue"": 0.0, ""condition"": 0.0}",CSF,no_celltype_annotation,WARN
 CSF_29,GSE133028,tissue;condition,patient;donor;celltype;dataset;sample,28.6,"{""tissue"": 0.0, ""condition"": 0.0}",CSF,no_celltype_annotation,WARN
 CSF_3,GSE133028,tissue;condition,patient;donor;celltype;dataset;sample,28.6,"{""tissue"": 0.0, ""condition"": 0.0}",CSF,no_celltype_annotation,WARN
 CSF_31,GSE133028,tissue;condition,patient;donor;celltype;dataset;sample,28.6,"{""tissue"": 0.0, ""condition"": 0.0}",CSF,no_celltype_annotation,WARN
-CSF_32,GSE133028,tissue;condition,patient;donor;celltype;dataset;sample,28.6,"{""tissue"": 0.0, ""condition"": 0.0}",PBMC,nonstandard_tissue_label(PBMC);tissue_obs=PBMC_vs_filename=CSF;no_celltype_annotation,FAIL
-CSF_6,GSE133028,tissue;condition,patient;donor;celltype;dataset;sample,28.6,"{""tissue"": 0.0, ""condition"": 0.0}",PB,tissue_obs=PB_vs_filename=CSF;no_celltype_annotation,FAIL
+CSF_32,GSE133028,tissue;condition,patient;donor;celltype;dataset;sample,28.6,"{""tissue"": 0.0, ""condition"": 0.0}",CSF,no_celltype_annotation,WARN
+CSF_6,GSE133028,tissue;condition,patient;donor;celltype;dataset;sample,28.6,"{""tissue"": 0.0, ""condition"": 0.0}",CSF,no_celltype_annotation,WARN
 CSF_7,GSE133028,tissue;condition,patient;donor;celltype;dataset;sample,28.6,"{""tissue"": 0.0, ""condition"": 0.0}",CSF,no_celltype_annotation,WARN
 CSF_8,GSE133028,tissue;condition,patient;donor;celltype;dataset;sample,28.6,"{""tissue"": 0.0, ""condition"": 0.0}",CSF,no_celltype_annotation,WARN
 CSF_9,GSE133028,tissue;condition,patient;donor;celltype;dataset;sample,28.6,"{""tissue"": 0.0, ""condition"": 0.0}",CSF,no_celltype_annotation,WARN
 PB_10,GSE133028,tissue;condition,patient;donor;celltype;dataset;sample,28.6,"{""tissue"": 0.0, ""condition"": 0.0}",PB,no_celltype_annotation,WARN
 PB_16,GSE133028,tissue;condition,patient;donor;celltype;dataset;sample,28.6,"{""tissue"": 0.0, ""condition"": 0.0}",PB,no_celltype_annotation,WARN
-PB_2,GSE133028,tissue;condition,patient;donor;celltype;dataset;sample,28.6,"{""tissue"": 0.0, ""condition"": 0.0}",CSF,tissue_obs=CSF_vs_filename=PB;no_celltype_annotation,FAIL
+PB_2,GSE133028,tissue;condition,patient;donor;celltype;dataset;sample,28.6,"{""tissue"": 0.0, ""condition"": 0.0}",PB,no_celltype_annotation,WARN
 PB_22,GSE133028,tissue;condition,patient;donor;celltype;dataset;sample,28.6,"{""tissue"": 0.0, ""condition"": 0.0}",PB,no_celltype_annotation,WARN
 PB_24,GSE133028,tissue;condition,patient;donor;celltype;dataset;sample,28.6,"{""tissue"": 0.0, ""condition"": 0.0}",PB,no_celltype_annotation,WARN
 PB_25,GSE133028,tissue;condition,patient;donor;celltype;dataset;sample,28.6,"{""tissue"": 0.0, ""condition"": 0.0}",PB,no_celltype_annotation,WARN
 PB_27,GSE133028,tissue;condition,patient;donor;celltype;dataset;sample,28.6,"{""tissue"": 0.0, ""condition"": 0.0}",PB,no_celltype_annotation,WARN
 PB_28,GSE133028,tissue;condition,patient;donor;celltype;dataset;sample,28.6,"{""tissue"": 0.0, ""condition"": 0.0}",PB,no_celltype_annotation,WARN
 PB_29,GSE133028,tissue;condition,patient;donor;celltype;dataset;sample,28.6,"{""tissue"": 0.0, ""condition"": 0.0}",PB,no_celltype_annotation,WARN
-PB_3,GSE133028,tissue;condition,patient;donor;celltype;dataset;sample,28.6,"{""tissue"": 0.0, ""condition"": 0.0}",PBMC,nonstandard_tissue_label(PBMC);no_celltype_annotation,WARN
+PB_3,GSE133028,tissue;condition,patient;donor;celltype;dataset;sample,28.6,"{""tissue"": 0.0, ""condition"": 0.0}",PB,no_celltype_annotation,WARN
 PB_31,GSE133028,tissue;condition,patient;donor;celltype;dataset;sample,28.6,"{""tissue"": 0.0, ""condition"": 0.0}",PB,no_celltype_annotation,WARN
-PB_32,GSE133028,tissue;condition,patient;donor;celltype;dataset;sample,28.6,"{""tissue"": 0.0, ""condition"": 0.0}",PBMC,nonstandard_tissue_label(PBMC);no_celltype_annotation,WARN
-PB_6,GSE133028,tissue;condition,patient;donor;celltype;dataset;sample,28.6,"{""tissue"": 0.0, ""condition"": 0.0}",CSF,tissue_obs=CSF_vs_filename=PB;no_celltype_annotation,FAIL
-PB_7,GSE133028,tissue;condition,patient;donor;celltype;dataset;sample,28.6,"{""tissue"": 0.0, ""condition"": 0.0}",CSF,tissue_obs=CSF_vs_filename=PB;no_celltype_annotation,FAIL
+PB_32,GSE133028,tissue;condition,patient;donor;celltype;dataset;sample,28.6,"{""tissue"": 0.0, ""condition"": 0.0}",PB,no_celltype_annotation,WARN
+PB_6,GSE133028,tissue;condition,patient;donor;celltype;dataset;sample,28.6,"{""tissue"": 0.0, ""condition"": 0.0}",PB,no_celltype_annotation,WARN
+PB_7,GSE133028,tissue;condition,patient;donor;celltype;dataset;sample,28.6,"{""tissue"": 0.0, ""condition"": 0.0}",PB,no_celltype_annotation,WARN
 PB_8,GSE133028,tissue;condition,patient;donor;celltype;dataset;sample,28.6,"{""tissue"": 0.0, ""condition"": 0.0}",PB,no_celltype_annotation,WARN
 PB_9,GSE133028,tissue;condition,patient;donor;celltype;dataset;sample,28.6,"{""tissue"": 0.0, ""condition"": 0.0}",PB,no_celltype_annotation,WARN
 MS19270_CSF,GSE138266,patient;donor;tissue;condition;dataset;sample,celltype,85.7,"{""patient"": 0.0, ""donor"": 0.0, ""tissue"": 0.0, ""condition"": 0.0, ""dataset"": 0.0, ""sample"": 0.0}",CSF,no_celltype_annotation,WARN
