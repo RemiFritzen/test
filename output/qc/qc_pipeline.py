@@ -40,7 +40,7 @@ np.random.seed(0)
 # ----------------------------------------------------------------------------
 # Paths
 # ----------------------------------------------------------------------------
-BASE = "/Users/remi/Library/Mobile Documents/com~apple~CloudDocs/Work/Papers/Research papers/2026 CXCR3"
+BASE = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", ".."))
 PROC = os.path.join(BASE, "data", "processed")
 QC_DIR = os.path.join(BASE, "output", "qc")
 PLOT_DIR = os.path.join(QC_DIR, "plots")
@@ -98,22 +98,25 @@ def discover_samples():
 # ----------------------------------------------------------------------------
 def compute_qc_metrics(adata):
     """Ensure n_genes_by_counts, total_counts, pct_counts_mt exist on .obs."""
-    X = adata.X
     needs = not all(c in adata.obs.columns for c in
                     ["n_genes_by_counts", "total_counts", "pct_counts_mt"])
     if needs:
-        adata.var["mt"] = adata.var_names.str.upper().str.startswith("MT-")
-        sc.pp.calculate_qc_metrics(adata, qc_vars=["mt"], inplace=True,
-                                   percent_top=None, log1p=False)
-    # always (re)derive pct_counts_mt if mt genes exist but col missing
-    if "pct_counts_mt" not in adata.obs.columns:
-        adata.var["mt"] = adata.var_names.str.upper().str.startswith("MT-")
-        sc.pp.calculate_qc_metrics(adata, qc_vars=["mt"], inplace=True,
-                                   percent_top=None, log1p=False)
+        # np.asarray(..., dtype=bool) is required on pandas >= 3: var_names is a
+        # StringDtype index there, so .str.startswith returns a nullable
+        # BooleanArray, which scanpy cannot use (it calls .nonzero() internally).
+        adata.var["mt"] = np.asarray(
+            adata.var_names.str.upper().str.startswith("MT-"), dtype=bool
+        )
+        sc.pp.calculate_qc_metrics(
+            adata, qc_vars=["mt"], inplace=True,
+            percent_top=None, log1p=False,
+        )
     return adata
 
 
 def qc_flags(row):
+    if any(row[k] != row[k] for k in ("median_genes", "median_counts")):
+        return {"cells": "FAIL", "genes": "FAIL", "counts": "FAIL", "mito": "FAIL"}
     flags = {}
     # cells
     if row["n_cells"] < THRESH["min_cells"]:
